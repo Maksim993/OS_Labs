@@ -15,9 +15,8 @@ void start_child_process(int read_fd, const char* child_program, const char* out
         perror("Ошибка dup2"); 
         exit(IO_ERROR);        
     }
-    close(read_fd);  // Закрываем исходный файловый дескриптор
+    close(read_fd);  
     
-    // Заменяем текущую программу на дочернюю программу
     execlp(child_program, child_program, (char* )output_name, (char* )NULL);
     
     perror("Ошибка execlp");
@@ -54,12 +53,10 @@ int main() {
         file1_name[bytes_read] = '\0';
     }
     
-    // Запрашиваем имя файла для второго дочернего процесса
     const char* str2 = "Введите имя файла для child 2: ";
     write(STDOUT_FILENO, "Введите имя файла для child 2: \n", strlen(str2));
     fflush(stdout);
     
-    // Читаем ввод пользователя
     bytes_read = read(STDIN_FILENO, file2_name, MAX_FILENAME_LENGTH - 1);
     if (bytes_read <= 0) {
         return INVALID_INPUT; 
@@ -70,7 +67,6 @@ int main() {
         file2_name[bytes_read] = '\0';
     }
     
-    // Создаем pipes для общения с детьми
     if (pipe(pipe1_fd) == -1 || pipe(pipe2_fd) == -1) {
         perror("Ошибка pipe");  
         return PIPE_ERROR;      
@@ -84,7 +80,6 @@ int main() {
         goto cleanup_pipes;       
     }
 
-    // Код для первого дочернего процесса
     if (pid_1 == 0) {
         close(pipe1_fd[1]);  // Закрываем конец для записи в первый канал
         close(pipe2_fd[0]);  // Закрываем второй канал полностью (не используем)
