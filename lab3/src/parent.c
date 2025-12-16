@@ -138,7 +138,7 @@ int main() {
         
         // Копирование данных в разделяемую память
         strncpy(target_shared->data, buffer, MAX_LINE_LENGTH - 1);
-        target_shared->data_ready = 1;
+        target_shared->data_ready = 1; // поднимает флаг "данные готовы"
         
         // Ожидание обработки дочерним процессом
         while (target_shared->data_ready == 1) {
