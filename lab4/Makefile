@@ -1,8 +1,8 @@
 CC = gcc
-CFLAGS = -fPIC -Wall -I./include
-LDFLAGS = -shared
+CFLAGS = -fPIC -Wall -I./include # -fPIC - для библиотек!
+LDFLAGS = -shared				# Создаем разделяемую библиотеку
 PROG1_LDFLAGS = -L./bin -ltranslation_bin -lsort_bubble -Wl,-rpath,./bin
-PROG2_LDFLAGS = -ldl
+PROG2_LDFLAGS = -ldl	# Библиотека динамической загрузки
 
 # Директории
 SRC_DIR = lib

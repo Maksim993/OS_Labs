@@ -2,22 +2,24 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <dlfcn.h> 
+#include <dlfcn.h> // ДЛЯ ДИНАМИЧЕСКОЙ ЗАГРУЗКИ!
 #include <unistd.h>
 #include "../include/contract.h"
 
 // Типы указателей на функции
-typedef char* (*TranslationFunc)(long);
-typedef int* (*SortFunc)(int*);
+typedef char* (*TranslationFunc)(long); // Указатель на функцию translation
+typedef int* (*SortFunc)(int*);         // Указатель на функцию sort
 
 static TranslationFunc current_translation = NULL;
 static SortFunc current_sort = NULL;
 
+// Дескрипторы загруженных библиотек
 static void *lib_handle_1_v1 = NULL;
 static void *lib_handle_1_v2 = NULL;
 static void *lib_handle_2_v1 = NULL;
 static void *lib_handle_2_v2 = NULL;
 
+// Текущие выбранные реализации
 static int current_impl_1 = 1;  // 1 - двоичная, 2 - троичная
 static int current_impl_2 = 1;  // 1 - пузырьковая, 2 - Хоара
 
@@ -53,6 +55,7 @@ static int read_line(char *buffer, size_t max_len) {
     return (int)bytes_read;
 }
 
+// ЗАГРУЗКА БИБЛИОТЕК 
 static int load_libraries() {
     lib_handle_1_v1 = dlopen(LIB1_V1_PATH, RTLD_LAZY);
     lib_handle_1_v2 = dlopen(LIB1_V2_PATH, RTLD_LAZY);
@@ -66,6 +69,8 @@ static int load_libraries() {
         return 0;
     }
 
+    // ПОЛУЧАЕМ УКАЗАТЕЛИ НА ФУНКЦИИ
+    // Начинаем с первых реализаций
     current_translation = (TranslationFunc)dlsym(lib_handle_1_v1, "translation");
     current_sort = (SortFunc)dlsym(lib_handle_2_v1, "sort");
     
@@ -79,6 +84,7 @@ static int load_libraries() {
     return 1;
 }
 
+// Выгрузка библиотек
 static void unload_libraries() {
     if (lib_handle_1_v1) dlclose(lib_handle_1_v1);
     if (lib_handle_1_v2) dlclose(lib_handle_1_v2);
@@ -86,6 +92,7 @@ static void unload_libraries() {
     if (lib_handle_2_v2) dlclose(lib_handle_2_v2);
 }
 
+// ПЕРЕКЛЮЧЕНИЕ РЕАЛИЗАЦИЙ
 static void switch_implementations() {
     // Переключаем реализацию перевода
     current_impl_1 = (current_impl_1 == 1) ? 2 : 1;
@@ -124,6 +131,7 @@ static void handle_function_1(const char *arg_str) {
         return;
     }
 
+    // вызываем функцию ЧЕРЕЗ УКАЗАТЕЛЬ
     char *result = current_translation(x);
     
     if (result) {
@@ -192,6 +200,7 @@ static void handle_function_2(const char *arg_str) {
 }
 
 int main() {
+    // 1. ЗАГРУЖАЕМ БИБЛИОТЕКИ
     if (!load_libraries()) {
         write_str("Критическая ошибка инициализации. Выход.\n");
         unload_libraries();
@@ -228,7 +237,7 @@ int main() {
         
         write_str("\nВведите команду: ");
     }
-
+    // 3. ВЫГРУЖАЕМ БИБЛИОТЕКИ
     unload_libraries();
     return 0;
 }

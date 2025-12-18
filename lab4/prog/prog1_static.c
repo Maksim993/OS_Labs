@@ -8,10 +8,12 @@
 #define STDOUT_FD 1
 #define STDIN_FD 0
 
+// Вспомогательная функция: вывод строки
 static void print_str(const char* s) {
     write(STDOUT_FD, s, strlen(s));
 }
 
+// Вспомогательная функция: вывод числа
 static void print_int(int num) {
     char buf[32];
     int len = snprintf(buf, sizeof(buf), "%d", num);
@@ -20,6 +22,7 @@ static void print_int(int num) {
     }
 }
 
+// Парсинг числа из строки
 static int parse_long(const char *str, long *val) {
     if (!str || !*str) return 0;
     long result = 0;
@@ -46,6 +49,7 @@ static int parse_long(const char *str, long *val) {
     return 1;
 }
 
+// Обработка команды "1" (перевод числа)
 static void handle_function_1(const char* arg_str) {
     long x;
     if (!parse_long(arg_str, &x)) {
@@ -53,6 +57,8 @@ static void handle_function_1(const char* arg_str) {
         return;
     }
 
+    // ВЫЗОВ СТАТИЧЕСКОЙ ФУНКЦИИ из библиотеки
+    // Эта функция ВШИТА в программу
     char* res = translation(x);
     if (res) {
         print_str("Результат (двоичный): ");
@@ -64,6 +70,7 @@ static void handle_function_1(const char* arg_str) {
     }
 }
 
+// Обработка команды "2" (сортировка массива)
 static void handle_function_2(const char* arg_str) {
     int temp_arr[101];  // +1 для завершающего нуля
     size_t count = 0;
@@ -115,6 +122,7 @@ static void handle_function_2(const char* arg_str) {
     }
     print_str("\n");
 
+    // ВЫЗОВ СТАТИЧЕСКОЙ ФУНКЦИИ сортировки
     int* sorted_arr = sort(arr_to_sort);
     
     print_str("Результат (Пузырьковая): ");
